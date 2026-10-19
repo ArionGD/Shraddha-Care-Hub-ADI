@@ -5,8 +5,8 @@ import { Layout } from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Loader2, BookOpen } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { CalendarDays, Loader2, BookOpen, Globe2 } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import {
   fetchSessionBundle,
   fetchUpcomingSession,
@@ -14,11 +14,17 @@ import {
   PROGRAMS,
   DEMO_PAST_SESSIONS,
   type StudyCircleProgram,
+  type StudyCircleSession,
 } from "@/lib/studycircle";
 import { SessionViewer } from "@/components/studycircle/SessionViewer";
+import { useI18n } from "@/i18n";
+import { cn } from "@/lib/utils";
 
 export default function StudyCircle() {
   const [params, setParams] = useSearchParams();
+  const { lang, setLang } = useI18n();
+  const isBn = lang === "bn";
+
   const requested = params.get("program");
   const program: StudyCircleProgram = requested === "kathamrita" ? "kathamrita" : "pathochokro";
 
@@ -45,16 +51,24 @@ export default function StudyCircle() {
   const past = useQuery({
     queryKey: ["study-circle-past", program],
     queryFn: async () => {
+      if (!isSupabaseConfigured) {
+        return DEMO_PAST_SESSIONS[program] ?? [];
+      }
       try {
         const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
-        const { data, error } = await supabase
-          .from("study_circle_sessions")
-          .select("*")
-          .eq("program_type", program)
-          .eq("is_published", true)
-          .lt("scheduled_date", today)
-          .order("scheduled_date", { ascending: false })
-          .limit(5);
+        const { data, error } = await Promise.race([
+          supabase
+            .from("study_circle_sessions")
+            .select("*")
+            .eq("program_type", program)
+            .eq("is_published", true)
+            .lt("scheduled_date", today)
+            .order("scheduled_date", { ascending: false })
+            .limit(5),
+          new Promise<{ data: null; error: Error }>((_, reject) =>
+            setTimeout(() => reject(new Error("Timeout")), 1500),
+          ),
+        ]);
 
         if (error || !data || data.length === 0) {
           return DEMO_PAST_SESSIONS[program] ?? [];
@@ -74,15 +88,44 @@ export default function StudyCircle() {
       {/* Hero Banner */}
       <section className="bg-gradient-to-br from-primary/10 via-background to-accent/20 py-12 lg:py-16 border-b">
         <div className="container max-w-5xl text-center">
+          {/* Top Language Toggle Pill */}
+          <div className="flex items-center justify-center mb-4">
+            <div className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/80 p-1 shadow-sm backdrop-blur">
+              <Globe2 className="h-3.5 w-3.5 text-muted-foreground ml-2" />
+              <button
+                type="button"
+                onClick={() => setLang("en")}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-semibold transition-all",
+                  lang === "en" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang("bn")}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-semibold transition-all",
+                  lang === "bn" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                বাংলা
+              </button>
+            </div>
+          </div>
+
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-3">
             <BookOpen className="h-3.5 w-3.5" />
-            Hosla Senior Citizen Wellness
+            {isBn ? "হোসলা প্রবীণ কল্যাণ" : "Hosla Senior Citizen Wellness"}
           </span>
           <h1 className="font-serif text-3xl lg:text-5xl font-bold text-foreground">
-            Study Circle / পাঠচক্র সূচী
+            {isBn ? "পাঠচক্র ও কথামৃত সূচী" : "Study Circle Schedule"}
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground text-sm lg:text-base">
-            সাপ্তাহিক পাঠচক্র ও রামকৃষ্ণ কথামৃত অধিবেশনের দায়িত্বপ্রাপ্ত ব্যক্তিবর্গ এবং সূচী।
+            {isBn
+              ? "সাপ্তাহিক পাঠচক্র ও রামকৃষ্ণ কথামৃত অধিবেশনের দায়িত্বপ্রাপ্ত ব্যক্তিবর্গ এবং সূচী।"
+              : "Weekly schedule, assigned roles, and agendas for Tuesday Ramakrishna Kathamrita and Thursday Pathochokro sessions."}
           </p>
         </div>
       </section>
@@ -95,13 +138,13 @@ export default function StudyCircle() {
               value="pathochokro"
               className="py-3 text-sm sm:text-base font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm rounded-lg"
             >
-              {PROGRAMS.pathochokro.labelBn} · বৃহস্পতিবার (Thu)
+              {isBn ? `${PROGRAMS.pathochokro.labelBn} · বৃহস্পতিবার` : `${PROGRAMS.pathochokro.labelEn} · Thursday`}
             </TabsTrigger>
             <TabsTrigger
               value="kathamrita"
               className="py-3 text-sm sm:text-base font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm rounded-lg"
             >
-              {PROGRAMS.kathamrita.labelBn} · মঙ্গলবার (Tue)
+              {isBn ? `${PROGRAMS.kathamrita.labelBn} · মঙ্গলবার` : `${PROGRAMS.kathamrita.labelEn} · Tuesday`}
             </TabsTrigger>
           </TabsList>
 
@@ -109,16 +152,20 @@ export default function StudyCircle() {
             {current.isLoading || bundle.isLoading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">সূচী লোড হচ্ছে…</p>
+                <p className="text-sm text-muted-foreground">{isBn ? "সূচী লোড হচ্ছে…" : "Loading schedule…"}</p>
               </div>
             ) : bundle.data ? (
               <SessionViewer bundle={bundle.data} />
             ) : (
               <div className="rounded-2xl border border-dashed bg-muted/20 p-12 text-center">
                 <CalendarDays className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
-                <h2 className="text-xl font-bold text-foreground">পরবর্তী অধিবেশন এখনও নির্ধারিত হয়নি</h2>
+                <h2 className="text-xl font-bold text-foreground">
+                  {isBn ? "পরবর্তী অধিবেশন এখনও নির্ধারিত হয়নি" : "No session scheduled yet"}
+                </h2>
                 <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-                  অ্যাডমিন নতুন অধিবেশন প্রকাশ করলে তালিকাটি এখানে প্রদর্শিত হবে।
+                  {isBn
+                    ? "অ্যাডমিন নতুন অধিবেশন প্রকাশ করলে তালিকাটি এখানে প্রদর্শিত হবে।"
+                    : "Upcoming sessions will appear here once published by the administration."}
                 </p>
               </div>
             )}
@@ -129,7 +176,7 @@ export default function StudyCircle() {
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="past-sessions" className="border rounded-xl px-4 bg-card shadow-sm">
                     <AccordionTrigger className="text-base font-semibold py-4">
-                      পূর্ববর্তী অধিবেশনসমূহ (Past 5 Sessions)
+                      {isBn ? "পূর্ববর্তী অধিবেশনসমূহ (Past 5 Sessions)" : "Past Sessions Archive (Last 5 Sessions)"}
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-3 pt-2 pb-3">
@@ -137,8 +184,8 @@ export default function StudyCircle() {
                           <PastSessionItem
                             key={s.id}
                             sessionId={s.id}
-                            title={s.title_bn}
-                            date={formatSessionDate(s.scheduled_date)}
+                            title={isBn ? s.title_bn : (s.title_en || s.title_bn)}
+                            date={formatSessionDate(s.scheduled_date, lang)}
                           />
                         ))}
                       </div>
@@ -155,7 +202,9 @@ export default function StudyCircle() {
                 onClick={() => setParams({ program: otherProgram }, { replace: true })}
                 className="gap-2 text-sm"
               >
-                Switch to {PROGRAMS[otherProgram].labelBn} ({PROGRAMS[otherProgram].dayLabel})
+                {isBn
+                  ? `Switch to ${PROGRAMS[otherProgram].labelBn} (${PROGRAMS[otherProgram].dayLabelBn})`
+                  : `Switch to ${PROGRAMS[otherProgram].labelEn} (${PROGRAMS[otherProgram].dayLabelEn})`}
               </Button>
             </div>
           </TabsContent>
