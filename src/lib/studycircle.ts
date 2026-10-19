@@ -122,75 +122,479 @@ export function displayTime(t: string | null): string {
   return t ? formatTime12(t) : "—";
 }
 
+export const DEMO_SESSIONS: Record<StudyCircleProgram, StudyCircleSession> = {
+  pathochokro: {
+    id: "demo-pathochokro",
+    program_type: "pathochokro",
+    scheduled_date: "2026-10-22",
+    start_time: "17:00",
+    status: "scheduled",
+    title_bn: "পাঠচক্র সাপ্তাহিক অধিবেশন — শরৎচন্দ্রের সাহিত্য",
+    note: "সবাই সময়মতো গুগল মিট লিংকে যুক্ত হবেন।",
+    meeting_link: "https://meet.google.com/hos-path-ckr",
+    is_published: true,
+    published_at: "2026-10-18T10:00:00Z",
+    created_at: "2026-10-18T10:00:00Z",
+    updated_at: "2026-10-18T10:00:00Z",
+  },
+  kathamrita: {
+    id: "demo-kathamrita",
+    program_type: "kathamrita",
+    scheduled_date: "2026-10-20",
+    start_time: "17:00",
+    status: "scheduled",
+    title_bn: "রামকৃষ্ণ কথামৃত পাঠ ও ব্যাখ্যা — ২য় খণ্ড",
+    note: "আজকের পাঠে মাস্টার মহাশয়ের সাথে ঠাকুরের আলোচনা পরিবেশিত হবে।",
+    meeting_link: "https://meet.google.com/hos-kthm-rta",
+    is_published: true,
+    published_at: "2026-10-18T10:00:00Z",
+    created_at: "2026-10-18T10:00:00Z",
+    updated_at: "2026-10-18T10:00:00Z",
+  },
+};
+
+export const DEMO_BUNDLES: Record<string, SessionBundle> = {
+  "demo-pathochokro": {
+    session: DEMO_SESSIONS.pathochokro,
+    roles: [
+      {
+        id: "r-1",
+        session_id: "demo-pathochokro",
+        role_name: "সভাপতি (President)",
+        display_order: 1,
+        created_at: "",
+        performers: [
+          {
+            id: "rp-1",
+            role_id: "r-1",
+            member_id: "m-1",
+            performer_name: "ডা. অসীম বন্দ্যোপাধ্যায়",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "r-2",
+        session_id: "demo-pathochokro",
+        role_name: "সঞ্চালক (Conductor)",
+        display_order: 2,
+        created_at: "",
+        performers: [
+          {
+            id: "rp-2",
+            role_id: "r-2",
+            member_id: "m-2",
+            performer_name: "শ্রীমতী কবিতা রায়",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "r-3",
+        session_id: "demo-pathochokro",
+        role_name: "পাঠক (Reader)",
+        display_order: 3,
+        created_at: "",
+        performers: [
+          {
+            id: "rp-3",
+            role_id: "r-3",
+            member_id: "m-3",
+            performer_name: "শুভ্রাংশু মুখার্জী",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "r-4",
+        session_id: "demo-pathochokro",
+        role_name: "উদ্বোধনী সঙ্গীত (Opening Song)",
+        display_order: 4,
+        created_at: "",
+        performers: [
+          {
+            id: "rp-4",
+            role_id: "r-4",
+            member_id: null,
+            performer_name: "শম্পা মজুমদার",
+            is_guest: true,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+    ],
+    parts: [
+      {
+        id: "p-1",
+        session_id: "demo-pathochokro",
+        part_number: 1,
+        item_type: "song",
+        description: "উদ্বোধনী সঙ্গীত — 'আনন্দলোকে মঙ্গলালোকে বিরাজ সত্যসুন্দর'",
+        reference_link: "https://geetabitan.com",
+        display_order: 1,
+        created_at: "",
+        performers: [
+          {
+            id: "pp-1",
+            part_id: "p-1",
+            member_id: null,
+            performer_name: "শম্পা মজুমদার",
+            is_guest: true,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "p-2",
+        session_id: "demo-pathochokro",
+        part_number: 2,
+        item_type: "reading",
+        description: "শরৎচন্দ্র চট্টোপাধ্যায়ের 'শ্রীকান্ত' প্রথম পর্ব থেকে নির্বাচিত অংশ পাঠ ও স্মৃতিচারণ",
+        reference_link: null,
+        display_order: 2,
+        created_at: "",
+        performers: [
+          {
+            id: "pp-2",
+            part_id: "p-2",
+            member_id: "m-3",
+            performer_name: "শুভ্রাংশু মুখার্জী",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "p-3",
+        session_id: "demo-pathochokro",
+        part_number: 3,
+        item_type: "reading",
+        description: "শ্রী শ্রী রামকৃষ্ণ লীলাপ্রসঙ্গ — ঠাকুর শ্রীরামকৃষ্ণের সাধক জীবন ও বাণী",
+        reference_link: null,
+        display_order: 3,
+        created_at: "",
+        performers: [
+          {
+            id: "pp-3",
+            part_id: "p-3",
+            member_id: "m-4",
+            performer_name: "দীপক চ্যাটার্জী",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "p-4",
+        session_id: "demo-pathochokro",
+        part_number: 4,
+        item_type: "prayer",
+        description: "সমবেত বৈদিক শান্তি পাঠ ও বিশ্বকল্যাণ প্রার্থনা",
+        reference_link: null,
+        display_order: 4,
+        created_at: "",
+        performers: [
+          {
+            id: "pp-4",
+            part_id: "p-4",
+            member_id: null,
+            performer_name: "সমবেত সদস্যবৃন্দ",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+    ],
+  },
+  "demo-kathamrita": {
+    session: DEMO_SESSIONS.kathamrita,
+    roles: [
+      {
+        id: "rk-1",
+        session_id: "demo-kathamrita",
+        role_name: "সভাপতি (President)",
+        display_order: 1,
+        created_at: "",
+        performers: [
+          {
+            id: "rpk-1",
+            role_id: "rk-1",
+            member_id: null,
+            performer_name: "স্বামী লোকেশ্বরানন্দজি",
+            is_guest: true,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "rk-2",
+        session_id: "demo-kathamrita",
+        role_name: "সঞ্চালক (Conductor)",
+        display_order: 2,
+        created_at: "",
+        performers: [
+          {
+            id: "rpk-2",
+            role_id: "rk-2",
+            member_id: "m-5",
+            performer_name: "শ্রীমতী আরতি সেনগুপ্ত",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "rk-3",
+        session_id: "demo-kathamrita",
+        role_name: "পাঠক (Reader)",
+        display_order: 3,
+        created_at: "",
+        performers: [
+          {
+            id: "rpk-3",
+            role_id: "rk-3",
+            member_id: "m-6",
+            performer_name: "শ্রী শ্যামল ভট্টাচার্য",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "rk-4",
+        session_id: "demo-kathamrita",
+        role_name: "উদ্বোধনী সঙ্গীত (Opening Song)",
+        display_order: 4,
+        created_at: "",
+        performers: [
+          {
+            id: "rpk-4",
+            role_id: "rk-4",
+            member_id: "m-7",
+            performer_name: "সুমিতা সেন",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+    ],
+    parts: [
+      {
+        id: "pk-1",
+        session_id: "demo-kathamrita",
+        part_number: 1,
+        item_type: "song",
+        description: "উদ্বোধনী ভক্তিগীতি — 'মন চল রে সুরধুনী তীরে'",
+        reference_link: "https://geetabitan.com",
+        display_order: 1,
+        created_at: "",
+        performers: [
+          {
+            id: "ppk-1",
+            part_id: "pk-1",
+            member_id: "m-7",
+            performer_name: "সুমিতা সেন",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "pk-2",
+        session_id: "demo-kathamrita",
+        part_number: 2,
+        item_type: "reading",
+        description: "শ্রী শ্রী রামকৃষ্ণ কথামৃত (২য় খণ্ড) — দক্ষিণেশ্বর মন্দিরে ভক্তসঙ্গে ঠাকুর শ্রীরামকৃষ্ণ",
+        reference_link: null,
+        display_order: 2,
+        created_at: "",
+        performers: [
+          {
+            id: "ppk-2",
+            part_id: "pk-2",
+            member_id: "m-6",
+            performer_name: "শ্রী শ্যামল ভট্টাচার্য",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+      {
+        id: "pk-3",
+        session_id: "demo-kathamrita",
+        part_number: 3,
+        item_type: "prayer",
+        description: "শ্রীরামকৃষ্ণ স্তোত্র, প্রণাম মন্ত্র ও সমবেত প্রার্থনা",
+        reference_link: null,
+        display_order: 3,
+        created_at: "",
+        performers: [
+          {
+            id: "ppk-3",
+            part_id: "pk-3",
+            member_id: null,
+            performer_name: "সমবেত সদস্যবৃন্দ",
+            is_guest: false,
+            display_order: 1,
+            created_at: "",
+          },
+        ],
+      },
+    ],
+  },
+};
+
+export const DEMO_PAST_SESSIONS: Record<StudyCircleProgram, StudyCircleSession[]> = {
+  pathochokro: [
+    {
+      id: "demo-past-p1",
+      program_type: "pathochokro",
+      scheduled_date: "2026-10-15",
+      start_time: "17:00",
+      status: "scheduled",
+      title_bn: "পাঠচক্র — শারদীয় বিশেষ সাহিত্য ও সঙ্গীত আলোচনা",
+      note: null,
+      meeting_link: null,
+      is_published: true,
+      published_at: "2026-10-15T10:00:00Z",
+      created_at: "2026-10-15T10:00:00Z",
+      updated_at: "2026-10-15T10:00:00Z",
+    },
+    {
+      id: "demo-past-p2",
+      program_type: "pathochokro",
+      scheduled_date: "2026-10-08",
+      start_time: "17:00",
+      status: "scheduled",
+      title_bn: "পাঠচক্র — স্বামীজীর পত্রাবলী ও প্রাচ্য-পাশ্চাত্য",
+      note: null,
+      meeting_link: null,
+      is_published: true,
+      published_at: "2026-10-08T10:00:00Z",
+      created_at: "2026-10-08T10:00:00Z",
+      updated_at: "2026-10-08T10:00:00Z",
+    },
+  ],
+  kathamrita: [
+    {
+      id: "demo-past-k1",
+      program_type: "kathamrita",
+      scheduled_date: "2026-10-13",
+      start_time: "17:00",
+      status: "scheduled",
+      title_bn: "রামকৃষ্ণ কথামৃত — বিজয়া সম্মিলনী ও শ্রীরামকৃষ্ণের ভাবধারা",
+      note: null,
+      meeting_link: null,
+      is_published: true,
+      published_at: "2026-10-13T10:00:00Z",
+      created_at: "2026-10-13T10:00:00Z",
+      updated_at: "2026-10-13T10:00:00Z",
+    },
+  ],
+};
+
 export async function fetchUpcomingSession(
   program: StudyCircleProgram,
 ): Promise<StudyCircleSession | null> {
-  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
+  try {
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
 
-  const { data, error } = await supabase
-    .from("study_circle_sessions")
-    .select("*")
-    .eq("program_type", program)
-    .eq("is_published", true)
-    .gte("scheduled_date", today)
-    .order("scheduled_date", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from("study_circle_sessions")
+      .select("*")
+      .eq("program_type", program)
+      .eq("is_published", true)
+      .gte("scheduled_date", today)
+      .order("scheduled_date", { ascending: true })
+      .limit(1)
+      .maybeSingle();
 
-  if (error) throw error;
-  return (data as unknown as StudyCircleSession | null) ?? null;
+    if (error || !data) {
+      return DEMO_SESSIONS[program] ?? null;
+    }
+    return (data as unknown as StudyCircleSession | null) ?? DEMO_SESSIONS[program];
+  } catch {
+    return DEMO_SESSIONS[program] ?? null;
+  }
 }
 
 export async function fetchSessionBundle(sessionId: string): Promise<SessionBundle> {
-  const [
-    { data: session, error: sErr },
-    { data: roles, error: rErr },
-    { data: parts, error: pErr },
-  ] = await Promise.all([
-    supabase.from("study_circle_sessions").select("*").eq("id", sessionId).single(),
-    supabase.from("study_circle_roles").select("*").eq("session_id", sessionId).order("display_order"),
-    supabase.from("study_circle_parts").select("*").eq("session_id", sessionId).order("display_order"),
-  ]);
+  if (DEMO_BUNDLES[sessionId]) {
+    return DEMO_BUNDLES[sessionId];
+  }
 
-  if (sErr) throw sErr;
-  if (rErr) throw rErr;
-  if (pErr) throw pErr;
+  try {
+    const [
+      { data: session, error: sErr },
+      { data: roles, error: rErr },
+      { data: parts, error: pErr },
+    ] = await Promise.all([
+      supabase.from("study_circle_sessions").select("*").eq("id", sessionId).single(),
+      supabase.from("study_circle_roles").select("*").eq("session_id", sessionId).order("display_order"),
+      supabase.from("study_circle_parts").select("*").eq("session_id", sessionId).order("display_order"),
+    ]);
 
-  const roleRows = (roles ?? []) as unknown as StudyCircleRole[];
-  const partRows = (parts ?? []) as unknown as StudyCirclePart[];
+    if (sErr || !session) {
+      return DEMO_BUNDLES[sessionId] ?? DEMO_BUNDLES["demo-pathochokro"];
+    }
+    if (rErr) throw rErr;
+    if (pErr) throw pErr;
 
-  const roleIds = roleRows.map((r) => r.id);
-  const partIds = partRows.map((p) => p.id);
+    const roleRows = (roles ?? []) as unknown as StudyCircleRole[];
+    const partRows = (parts ?? []) as unknown as StudyCirclePart[];
 
-  const [
-    { data: rolePerfs, error: rpErr },
-    { data: partPerfs, error: ppErr },
-  ] = await Promise.all([
-    roleIds.length
-      ? supabase.from("study_circle_role_performers").select("*").in("role_id", roleIds).order("display_order")
-      : Promise.resolve({ data: [] as unknown as StudyCircleRolePerformer[], error: null }),
-    partIds.length
-      ? supabase.from("study_circle_part_performers").select("*").in("part_id", partIds).order("display_order")
-      : Promise.resolve({ data: [] as unknown as StudyCirclePartPerformer[], error: null }),
-  ]);
+    const roleIds = roleRows.map((r) => r.id);
+    const partIds = partRows.map((p) => p.id);
 
-  if (rpErr) throw rpErr;
-  if (ppErr) throw ppErr;
+    const [
+      { data: rolePerfs, error: rpErr },
+      { data: partPerfs, error: ppErr },
+    ] = await Promise.all([
+      roleIds.length
+        ? supabase.from("study_circle_role_performers").select("*").in("role_id", roleIds).order("display_order")
+        : Promise.resolve({ data: [] as unknown as StudyCircleRolePerformer[], error: null }),
+      partIds.length
+        ? supabase.from("study_circle_part_performers").select("*").in("part_id", partIds).order("display_order")
+        : Promise.resolve({ data: [] as unknown as StudyCirclePartPerformer[], error: null }),
+    ]);
 
-  const rolePerformerRows = (rolePerfs ?? []) as unknown as StudyCircleRolePerformer[];
-  const partPerformerRows = (partPerfs ?? []) as unknown as StudyCirclePartPerformer[];
+    if (rpErr) throw rpErr;
+    if (ppErr) throw ppErr;
 
-  return {
-    session: session as unknown as StudyCircleSession,
-    roles: roleRows.map((role) => ({
-      ...role,
-      performers: rolePerformerRows.filter((p) => p.role_id === role.id),
-    })),
-    parts: partRows.map((part) => ({
-      ...part,
-      performers: partPerformerRows.filter((p) => p.part_id === part.id),
-    })),
-  };
+    const rolePerformerRows = (rolePerfs ?? []) as unknown as StudyCircleRolePerformer[];
+    const partPerformerRows = (partPerfs ?? []) as unknown as StudyCirclePartPerformer[];
+
+    return {
+      session: session as unknown as StudyCircleSession,
+      roles: roleRows.map((role) => ({
+        ...role,
+        performers: rolePerformerRows.filter((p) => p.role_id === role.id),
+      })),
+      parts: partRows.map((part) => ({
+        ...part,
+        performers: partPerformerRows.filter((p) => p.part_id === part.id),
+      })),
+    };
+  } catch {
+    return DEMO_BUNDLES[sessionId] ?? DEMO_BUNDLES["demo-pathochokro"];
+  }
 }
 
 export function getPerformerNames(

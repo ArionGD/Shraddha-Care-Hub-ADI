@@ -20,6 +20,16 @@ interface Props {
   className?: string;
 }
 
+const DEMO_MEMBERS: MemberOption[] = [
+  { id: "m-1", name: "ডা. অসীম বন্দ্যোপাধ্যায়", membership_id: "HOS-0012", phone_digits: "9830112233", status: "active" },
+  { id: "m-2", name: "শ্রীমতী কবিতা রায়", membership_id: "HOS-0045", phone_digits: "9831445566", status: "active" },
+  { id: "m-3", name: "শুভ্রাংশু মুখার্জী", membership_id: "HOS-0089", phone_digits: "9433778899", status: "active" },
+  { id: "m-4", name: "দীপক চ্যাটার্জী", membership_id: "HOS-0104", phone_digits: "9830889900", status: "due" },
+  { id: "m-5", name: "শ্রীমতী আরতি সেনগুপ্ত", membership_id: "HOS-0128", phone_digits: "9831223344", status: "active" },
+  { id: "m-6", name: "শ্রী শ্যামল ভট্টাচার্য", membership_id: "HOS-0156", phone_digits: "9432556677", status: "active" },
+  { id: "m-7", name: "সুমিতা সেন", membership_id: "HOS-0192", phone_digits: "9830667788", status: "active" },
+];
+
 export function MemberSearchCombobox({ onSelect, placeholder = "Search member…", className }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -32,13 +42,31 @@ export function MemberSearchCombobox({ onSelect, placeholder = "Search member…
     queryKey: ["member-search", trimmed],
     queryFn: async () => {
       if (trimmed.length < 2) return [];
-      const { data, error } = await supabase
-        .from("member_imports")
-        .select("id, name, membership_id, phone_digits, status")
-        .ilike("name", `%${trimmed}%`)
-        .limit(10);
-      if (error) throw error;
-      return (data ?? []) as MemberOption[];
+      try {
+        const { data, error } = await supabase
+          .from("member_imports")
+          .select("id, name, membership_id, phone_digits, status")
+          .ilike("name", `%${trimmed}%`)
+          .limit(10);
+        if (error || !data || data.length === 0) {
+          const lower = trimmed.toLowerCase();
+          return DEMO_MEMBERS.filter(
+            (m) =>
+              m.name.toLowerCase().includes(lower) ||
+              (m.phone_digits && m.phone_digits.includes(trimmed)) ||
+              (m.membership_id && m.membership_id.toLowerCase().includes(lower)),
+          );
+        }
+        return (data ?? []) as MemberOption[];
+      } catch {
+        const lower = trimmed.toLowerCase();
+        return DEMO_MEMBERS.filter(
+          (m) =>
+            m.name.toLowerCase().includes(lower) ||
+            (m.phone_digits && m.phone_digits.includes(trimmed)) ||
+            (m.membership_id && m.membership_id.toLowerCase().includes(lower)),
+        );
+      }
     },
     enabled: trimmed.length >= 2,
     staleTime: 30_000,

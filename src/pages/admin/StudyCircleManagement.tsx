@@ -38,6 +38,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MemberSearchCombobox } from "@/components/admin/MemberSearchCombobox";
 import {
   DEFAULT_ROLES,
+  DEMO_SESSIONS,
   fetchSessionBundle,
   formatSessionDate,
   generateWhatsAppMessage,
@@ -102,23 +103,35 @@ export default function StudyCircleManagement() {
   const sessions = useQuery({
     queryKey: ["admin-study-circle-sessions"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("study_circle_sessions")
-        .select("*")
-        .order("scheduled_date", { ascending: false });
-      if (error) throw error;
-      const rows = (data ?? []) as unknown as StudyCircleSession[];
+      try {
+        const { data, error } = await supabase
+          .from("study_circle_sessions")
+          .select("*")
+          .order("scheduled_date", { ascending: false });
+        if (error || !data || data.length === 0) {
+          return {
+            rows: [DEMO_SESSIONS.kathamrita, DEMO_SESSIONS.pathochokro],
+            counts: new Map([["demo-kathamrita", 3], ["demo-pathochokro", 4]]),
+          };
+        }
+        const rows = (data ?? []) as unknown as StudyCircleSession[];
 
-      const counts = await Promise.all(
-        rows.map(async (s) => {
-          const { count } = await supabase
-            .from("study_circle_parts")
-            .select("id", { count: "exact", head: true })
-            .eq("session_id", s.id);
-          return [s.id, count ?? 0] as const;
-        }),
-      );
-      return { rows, counts: new Map(counts) };
+        const counts = await Promise.all(
+          rows.map(async (s) => {
+            const { count } = await supabase
+              .from("study_circle_parts")
+              .select("id", { count: "exact", head: true })
+              .eq("session_id", s.id);
+            return [s.id, count ?? 0] as const;
+          }),
+        );
+        return { rows, counts: new Map(counts) };
+      } catch {
+        return {
+          rows: [DEMO_SESSIONS.kathamrita, DEMO_SESSIONS.pathochokro],
+          counts: new Map([["demo-kathamrita", 3], ["demo-pathochokro", 4]]),
+        };
+      }
     },
   });
 

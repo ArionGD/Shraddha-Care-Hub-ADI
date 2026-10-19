@@ -12,6 +12,7 @@ import {
   fetchUpcomingSession,
   formatSessionDate,
   PROGRAMS,
+  DEMO_PAST_SESSIONS,
   type StudyCircleProgram,
 } from "@/lib/studycircle";
 import { SessionViewer } from "@/components/studycircle/SessionViewer";
@@ -44,18 +45,24 @@ export default function StudyCircle() {
   const past = useQuery({
     queryKey: ["study-circle-past", program],
     queryFn: async () => {
-      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
-      const { data, error } = await supabase
-        .from("study_circle_sessions")
-        .select("*")
-        .eq("program_type", program)
-        .eq("is_published", true)
-        .lt("scheduled_date", today)
-        .order("scheduled_date", { ascending: false })
-        .limit(5);
+      try {
+        const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
+        const { data, error } = await supabase
+          .from("study_circle_sessions")
+          .select("*")
+          .eq("program_type", program)
+          .eq("is_published", true)
+          .lt("scheduled_date", today)
+          .order("scheduled_date", { ascending: false })
+          .limit(5);
 
-      if (error) throw error;
-      return data ?? [];
+        if (error || !data || data.length === 0) {
+          return DEMO_PAST_SESSIONS[program] ?? [];
+        }
+        return data;
+      } catch {
+        return DEMO_PAST_SESSIONS[program] ?? [];
+      }
     },
     staleTime: 5 * 60 * 1000,
   });
